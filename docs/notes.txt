@@ -1,0 +1,4 @@
+Under /sys/class/hwmon/,
+There exists multiple hwmonX directories.
+Each contain a "name" file that tells you what that directory corresponds to.
+There is one for GPU, drive, CPU, etc.

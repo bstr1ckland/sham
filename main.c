@@ -3,7 +3,8 @@
 
 int main()
 {
-    int cpu_temp = get_cpu_temp();
-    printf("CPU Tempurature: %d°C\n", cpu_temp);
+    double cpu_temp = get_cpu_temp();
+    printf("CPU Tempurature: %0.1f °C\n", cpu_temp);
+
     return 0;
 }

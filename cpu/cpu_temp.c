@@ -16,24 +16,21 @@
  */
 
 #include <stdio.h>
-#include "cpu_temp.h"
+#include <stdlib.h>
 
-int get_cpu_temp() 
+double get_cpu_temp() 
 {
+    // This file is the reported CPU temperature
     const char *path = "/sys/class/hwmon/hwmon2/temp1_input";
     FILE *file = fopen(path, "r");
-    
-    if (!file) 
-    {
+
+    if (file == NULL) {
         perror("Failed to open temperature file");
         return 1;
     }
 
-    // Tempurature in millidegrees Celsius
-    int tempurature;
-    
-    if (fscanf(file, "%d", &tempurature) != 1)
-    {
+    int temp_millideg;
+    if (fscanf(file, "%d", &temp_millideg) != 1) {
         perror("Failed to read temperature");
         fclose(file);
         return 1;
@@ -41,6 +38,7 @@ int get_cpu_temp()
 
     fclose(file);
 
-    // Convert from millidegrees to degrees
-    return tempurature / 1000;
+    // Convert millidegrees to degrees Celsius with decimal
+    printf("DEBUG: Raw millidegree temp: %d\n", temp_millideg);
+    return temp_millideg / 1000.0;
 }
