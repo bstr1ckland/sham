@@ -39,6 +39,5 @@ double get_cpu_temp()
     fclose(file);
 
     // Convert millidegrees to degrees Celsius with decimal
-    printf("DEBUG: Raw millidegree temp: %d\n", temp_millideg);
     return temp_millideg / 1000.0;
 }
