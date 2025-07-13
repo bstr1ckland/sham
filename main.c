@@ -4,15 +4,21 @@
 
 int main()
 {
+    // CPU
     double cpu_temp = get_cpu_temp();
-    printf("CPU Temperature: %0.1f °C\n", cpu_temp);
-
+    
+    // Uptime
     struct sysinfo info;
     sysinfo(&info);
 
-    // Make variables that get the hours, 
-    // minutes, seconds of uptime
-    printf("Uptime = %ld\n", info.uptime);
+    int uptime_hours = info.uptime / 3600;
+    int uptime_minutes = (info.uptime % 3600) / 60;
+    int uptime_seconds = info.uptime % 60;
+
+    // Print messages
+    printf("CPU Temperature: %0.1f°C\n", cpu_temp);
+    printf("System uptime: %dh %dm %ds\n", uptime_hours, 
+            uptime_minutes, uptime_seconds);
 
     return 0;
 }

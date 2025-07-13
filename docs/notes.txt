@@ -2,3 +2,10 @@ Under /sys/class/hwmon/,
 There exists multiple hwmonX directories.
 Each contain a "name" file that tells you what that directory corresponds to.
 There is one for GPU, drive, CPU, etc.
+
+hwmon0 = nvme
+hwmon1 = amdgpu
+hwmon2 = k10temp (cpu)
+hwmon3 = nct6687 (do research)
+hwmon4 = mt7921_phy0 (do research)
+
