@@ -9,3 +9,4 @@ hwmon2 = k10temp (cpu)
 hwmon3 = nct6687 (do research)
 hwmon4 = mt7921_phy0 (do research)
 
+TODO: Look into making the temp reading functions all one, but pass in parameter for the file?
