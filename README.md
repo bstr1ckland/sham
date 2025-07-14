@@ -4,3 +4,8 @@
 Terminal based health monitor for UNIX systems
 
 To be updated once 1.0 released
+
+### Supported Systems
+- UNIX Systems (?)
+  - Tested for Ubuntu, works
+  - WSL does not
