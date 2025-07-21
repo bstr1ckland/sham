@@ -7,5 +7,5 @@ To be updated once 1.0 released
 
 ### Supported Systems
 - UNIX Systems (?)
-  - Tested for Ubuntu, works
+  - Tested for Arch, Ubuntu, works
   - WSL does not
