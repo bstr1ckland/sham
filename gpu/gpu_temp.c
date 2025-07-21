@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "../helpers/errors.h"
 
 double get_gpu_temp() 
 {
@@ -15,11 +16,7 @@ double get_gpu_temp()
     const char *path = "/sys/class/hwmon/hwmon1/temp1_input";
     FILE *file = fopen(path, "r");
 
-    if (!file) 
-    {
-        perror("Failed to open temperature file");
-        return -1;
-    }
+    validate_file(file);
 
     int temp_millideg;
     if (fscanf(file, "%d", &temp_millideg) != 1) 

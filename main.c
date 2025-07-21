@@ -31,10 +31,11 @@ int main()
 
     // Print messages
     printf("CPU Temperature: %0.1f°C\n", cpu_temp);
-    printf("CPU USAGE: %d\n", cpu_usage);
+    printf("CPU USAGE: %d%%\n", cpu_usage);
     printf("GPU Temperature: %0.1f°C\n", gpu_temp);
     printf("System uptime: %dh %dm %ds\n", uptime_hours, 
             uptime_minutes, uptime_seconds);
+    
 
     return 0;
 }
