@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../helpers/errors.h"
+#include "../utils/errors.h"
 
 double get_cpu_temp() 
 {

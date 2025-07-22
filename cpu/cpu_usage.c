@@ -8,7 +8,7 @@
  *   Formula: CPU Utilization (%) = ((TOTAL - IDLE) / TOTAL) * 100
  *     IDLE = idle + iowait;
  *     USED = user + nice + system + irq + softirq + steal;
- *     TOTAL = IDLE + Used;
+ *     TOTAL = IDLE + USED;
  *
  *   /proc/stat file info:
  *   cpu  user     nice    system    idle      iowait    irq    softirq    steal   guest  guest_nice
@@ -29,29 +29,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "../helpers/errors.h"
+#include "../utils/errors.h"
 
-int get_cpu_usage()
+double get_cpu_usage()
 {
     // This file is the reported CPU usage
     const char *path = "/proc/stat";
-    FILE *file = fopen(path, "r");
 
-    validate_file(file);
-
-    // TODO: Read in data here for first reading. Use unsigned long long
     // Two readings are required to get usage over time - not instance
+    unsigned long long user1, nice1, system1, idle1, iowait1, irq1, softirq1, steal1;
+    unsigned long long user2, nice2, system2, idle2, iowait2, irq2, softirq2, steal2;
+
+    FILE *file = fopen(path, "r");
+    validate_file(file);
+    fscanf(file, "cpu %llu %llu %llu %llu %llu %llu %llu %llu", &user1, &nice1, 
+            &system1, &idle1, &iowait1, &irq1, &softirq1, &steal1);
+    fclose(file);
 
     // Sleep for a second and let the file update
     sleep(1); 
-
-    fopen(path, "r");
-
-    // TODO: Read in data here for second reading
-
+    
+    file = fopen(path, "r");
     validate_file(file);
-    
-    
+    fscanf(file, "cpu %llu %llu %llu %llu %llu %llu %llu %llu", &user2, &nice2, 
+            &system2, &idle2, &iowait2, &irq2, &softirq2, &steal2);
     fclose(file);
-    return 69;
+
+    // Create variables as described above to do calculation
+    unsigned long long idle_time = (idle2 + iowait2) - (idle1 + iowait1);
+    unsigned long long used_time = (user2 + nice2 + system2 + irq2 + softirq2 + steal2) 
+            - (user1 + nice1 + system1 + irq1 + softirq1 + steal1);
+    unsigned long long total_time = idle_time + used_time;
+
+    if(total_time == 0)
+    {
+        return 0;
+    }
+
+    return ((double)(total_time - idle_time) / total_time) * 100.0;
 }

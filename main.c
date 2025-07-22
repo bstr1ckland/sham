@@ -16,7 +16,7 @@ int main()
 {
     // CPU
     double cpu_temp = get_cpu_temp();
-    int cpu_usage = get_cpu_usage();
+    double cpu_usage = get_cpu_usage();
 
     // GPU
     double gpu_temp = get_gpu_temp();
@@ -31,11 +31,10 @@ int main()
 
     // Print messages
     printf("CPU Temperature: %0.1f°C\n", cpu_temp);
-    printf("CPU USAGE: %d%%\n", cpu_usage);
+    printf("CPU USAGE: %0.1f%%\n", cpu_usage);
     printf("GPU Temperature: %0.1f°C\n", gpu_temp);
     printf("System uptime: %dh %dm %ds\n", uptime_hours, 
             uptime_minutes, uptime_seconds);
     
-
     return 0;
 }
