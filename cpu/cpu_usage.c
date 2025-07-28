@@ -31,7 +31,7 @@
 #include <unistd.h>
 #include "../utils/errors.h"
 
-double get_cpu_usage()
+int get_cpu_usage()
 {
     // This file is the reported CPU usage
     const char *path = "/proc/stat";
@@ -61,10 +61,8 @@ double get_cpu_usage()
             - (user1 + nice1 + system1 + irq1 + softirq1 + steal1);
     unsigned long long total_time = idle_time + used_time;
 
-    if(total_time == 0)
-    {
-        return 0;
-    }
+    // Avoid division by 0
+    if(total_time == 0) return 0;
 
-    return ((double)(total_time - idle_time) / total_time) * 100.0;
+    return (int)(((double)used_time / total_time) * 100.0 + 0.5);;
 }

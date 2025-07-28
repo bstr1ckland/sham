@@ -13,7 +13,7 @@
 double get_cpu_temp() 
 {
     // This file is the reported CPU temperature
-    const char *path = "/sys/class/hwmon/hwmon2/temp1_input";
+    const char *path = "/sys/class/hwmon/hwmon1/temp1_input";
     FILE *file = fopen(path, "r");
 
     validate_file(file);
@@ -21,7 +21,7 @@ double get_cpu_temp()
     int temp_millideg;
     if (fscanf(file, "%d", &temp_millideg) != 1) 
     {
-        perror("Failed to read temperature");
+        perror("Failed to read CPU temperature");
         fclose(file);
         return -1;
     }

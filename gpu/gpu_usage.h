@@ -7,6 +7,6 @@
 #ifndef GPU_USAGE_H
 #define GPU_USAGE_H
 
-double get_gpu_usage(void);
+int get_gpu_usage(void);
 
 #endif

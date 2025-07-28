@@ -7,6 +7,6 @@
 #ifndef CPU_USAGE_H
 #define CPU_USAGE_H
 
-double get_cpu_usage(void);
+int get_cpu_usage(void);
 
 #endif

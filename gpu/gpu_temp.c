@@ -13,7 +13,7 @@
 double get_gpu_temp() 
 {
     // This file is the reported GPU temperature
-    const char *path = "/sys/class/hwmon/hwmon1/temp1_input";
+    const char *path = "/sys/class/hwmon/hwmon3/temp1_input";
     FILE *file = fopen(path, "r");
 
     validate_file(file);
