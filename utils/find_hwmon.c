@@ -8,17 +8,39 @@
  * 
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <string.h>
+
 char* find_hwmon(const char* target)
 {
-    const char *path = "/sys/class/hwmon";
+    const char* file_path = "/sys/class/hwmon";
 
-    /*
-     * TODO: 
-     * 1. loop through each subdir
-     * 2. check the @name file in each sub-dir and compare with target
-     * 3. return if found
-     */ 
+    DIR *dir = opendir(file_path);
+    struct dirent *entry;
+    const char* name_path;
+
+    if(!dir) perror("Error: Failed to open directory.\n");
+
+    while ((entry = readdir(dir)) != NULL)
+    {
+        // Skip . and .. 'directories'
+        if (strcmp(entry -> d_name, ".") == 0 || strcmp(entry -> d_name, "..") == 0) continue;
+
+        // add checks for amdgpu, k10temp, etc.
+        
+        const char* file_name;
+        
+        // entry -> d_name is the current working directory
+        //snprintf(name_path, sizeof(name_path), "%s/%s", file_path, entry -> d_name);
 
 
-    return 0;
+    }
+
+
+
+    closedir(dir);
+    return "hello";
+    
 }

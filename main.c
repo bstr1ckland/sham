@@ -3,7 +3,7 @@
  * Author: Ben Strickland
  * Date: 2025-07-03
  * Notes:
- *   Look into ncurses library for tui
+ *   Look into ncurses library for tui (text user interface)
  */
 
 #include <stdio.h>
@@ -12,11 +12,13 @@
 #include "cpu/cpu_usage.h"
 #include "gpu/gpu_temp.h"
 #include "gpu/gpu_usage.h"
+#include "utils/find_hwmon.h"
 
 int main()
 {
     // CPU
-    double cpu_temp = get_cpu_temp();
+    // TODO: add file paths to get_xx_temp()
+    double cpu_temp = get_cpu_temp(); 
     int cpu_usage = get_cpu_usage();
 
     // GPU
@@ -31,11 +33,11 @@ int main()
     int uptime_minutes = (info.uptime % 3600) / 60;
     int uptime_seconds = info.uptime % 60;
 
-    // Print messages
+    // Print metrics
     printf("CPU Temperature: %0.1f°C\n", cpu_temp);
-    printf("CPU USAGE: %d%%\n", cpu_usage);
+    printf("CPU Usage: %d%%\n", cpu_usage);
     printf("GPU Temperature: %0.1f°C\n", gpu_temp);
-    printf("GPU Vendor ID: %d\n", gpu_usage);
+    printf("GPU Usage: %d%%\n", gpu_usage);
     printf("System uptime: %dh %dm %ds\n", uptime_hours, 
             uptime_minutes, uptime_seconds);
     

@@ -5,7 +5,9 @@ Terminal based health monitor for UNIX systems
 
 To be updated once 1.0 released
 
-### Supported Systems
+### Supported Systems and Devices
 - UNIX Systems (?)
-  - Tested for Arch, Ubuntu, works
-  - WSL does not
+  - Arch, Ubuntu
+  - No VMs, or WSL
+
+- As of right now, only supporting devices with one GPU
