@@ -1,5 +1,5 @@
 /*
- * File: gpu_temp.c
+ * File: cpu_temp.c
  * Author: Ben Strickland
  * Date: 2025-07-13
  * Notes:
@@ -8,20 +8,31 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../utils/errors.h"
+#include "../utils/find_hwmon.h"
 
 double get_gpu_temp() 
 {
-    // This file is the reported GPU temperature
-    const char *path = "/sys/class/hwmon/hwmon3/temp1_input";
-    FILE *file = fopen(path, "r");
+    // Find correct hwmon directory for the CPU
+    char *hwmon_dir = find_hwmon("gpu");
+    if (!hwmon_dir) {
+        fprintf(stderr, "Could not find matching hwmon directory for GPU.\n");
+        return -1;
+    }
 
+    // Construct path to temperature input file
+    char path[512];
+    snprintf(path, sizeof(path), "/sys/class/hwmon/%s/temp1_input", hwmon_dir);
+    free(hwmon_dir); // cleanup
+
+    FILE *file = fopen(path, "r");
     validate_file(file);
 
     int temp_millideg;
     if (fscanf(file, "%d", &temp_millideg) != 1) 
     {
-        perror("Failed to read temperature");
+        perror("Failed to read CPU temperature");
         fclose(file);
         return -1;
     }
