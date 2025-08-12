@@ -20,6 +20,7 @@
 int get_gpu_usage()
 {
     // Determines what kind of GPU the user has
+    // So this is kinda hard coded but can change with later versions
     const char *path = "/sys/class/drm/card1/device/vendor";
     FILE *file = fopen(path, "r");
     validate_file(file);
@@ -52,7 +53,7 @@ int get_gpu_usage()
             break;
 
         case NVIDIA_GPU:
-            // Will have to make seperate file for this, as it requires its own header
+            // Will have to make separate file for this, as it requires its own header
             printf("nvidia\n");
             break;
 
