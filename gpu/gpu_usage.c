@@ -1,5 +1,5 @@
 /*
- * File: gpu_temp.c
+ * File: gpu_usage.c
  * Author: Ben Strickland
  * Date: 2025-07-13
  * Notes:
@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "gpu_usage.h"
+#include "nvidia_usage.h"
 #include "../utils/errors.h"
 
 int get_gpu_usage()
@@ -53,8 +54,7 @@ int get_gpu_usage()
             break;
 
         case NVIDIA_GPU:
-            // Will have to make separate file for this, as it requires its own header
-            printf("nvidia\n");
+            gpu_usage = get_nvidia_gpu_usage();
             break;
 
         default:
