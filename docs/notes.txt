@@ -1,1 +1,4 @@
-/proc/cpuinfo is CPU speed
+/sys/class/drm/card0/device/mem_info_vram_total
+/sys/class/drm/card0/device/mem_info_vram_used
+
+nvidia is again complicated, check with NVML
