@@ -1,24 +1,43 @@
-/*
- * File: gpu_usage.c
- * Author: Ben Strickland
- * Date: 2025-07-13
- * Notes:
- *   For AMD and Intel GPUs, the following file path reads
- *   GPU usage in percent: /sys/class/drm/card1/device/gpu_busy_percent
- * 
- *   Reading /sys/class/drm/card1/device/vendor will tell us what our card is.
- *    0x8086 -> Intel
- *    0x1002 / 0x1022 -> AMD
- *    0x10de -> NVIDIA
- */
-
 #include <stdio.h>
 #include <stdlib.h>
-#include "gpu_usage.h"
+#include <string.h>
+#include "gpu.h"
 #include "nvidia_usage.h"
 #include "../utils/errors.h"
+#include "../utils/find_hwmon.h"
 
-int get_gpu_usage()
+double gpu_temp() 
+{
+    // Find correct hwmon directory for the CPU
+    char *hwmon_dir = find_hwmon("gpu");
+    if (!hwmon_dir) {
+        fprintf(stderr, "Could not find matching hwmon directory for GPU.\n");
+        return -1;
+    }
+
+    // Construct path to temperature input file
+    char path[512];
+    snprintf(path, sizeof(path), "/sys/class/hwmon/%s/temp1_input", hwmon_dir);
+    free(hwmon_dir); // cleanup
+
+    FILE *file = fopen(path, "r");
+    validate_file(file);
+
+    int temp_millideg;
+    if (fscanf(file, "%d", &temp_millideg) != 1) 
+    {
+        perror("Failed to read CPU temperature");
+        fclose(file);
+        return -1;
+    }
+
+    fclose(file);
+
+    // Convert millidegrees to degrees Celsius with decimal
+    return temp_millideg / 1000.0;
+}
+
+int gpu_usage()
 {
     // Determines what kind of GPU the user has
     // So this is kinda hard coded but can change with later versions

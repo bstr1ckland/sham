@@ -2,3 +2,7 @@
 /sys/class/drm/card0/device/mem_info_vram_used
 
 nvidia is again complicated, check with NVML
+
+TODO:
+
+Convert all gpu files into one gpu.c file, and make a gpu struct
