@@ -18,6 +18,7 @@ int main()
     double cpuTemp = cpu_temp(); 
     int cpuUsage = cpu_usage();
     double cpuSpeed = cpu_speed();
+    double cpuMaxSpeed = cpu_max_speed();
 
     // GPU
     double gpuTemp = gpu_temp();
@@ -36,12 +37,11 @@ int main()
     // Print metrics
     printf("CPU Temperature: %0.1f°C\n", cpuTemp);
     printf("CPU Usage: %d%%\n", cpuUsage);
-    printf("CPU Speed: %0.1fMHz\n\n", cpuSpeed);
+    printf("CPU Speed: %0.1fMHz / %0.1fMHz\n\n", cpuSpeed, cpuMaxSpeed);
 
     printf("GPU Temperature: %0.1f°C\n", gpuTemp);
     printf("GPU Usage: %d%%\n", gpuUsage);
-    printf("GPU VRAM Total: %.1f GB\n", vramTotal);
-    printf("GPU VRAM Used: %.1f GB\n", vramUsed);
+    printf("GPU VRAM Used: %.1fGB / %.1fGB\n", vramUsed, vramTotal);
 
     double vramPercent = (vramUsed / vramTotal) * 100.0;
     printf("GPU VRAM Used Percent: %.1f%%\n\n", vramPercent);

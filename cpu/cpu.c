@@ -36,6 +36,28 @@ double cpu_speed()
     return total_mhz / core_count;
 }
 
+/**
+ * Returns the maximum speed for CPU in MHz
+ */
+double cpu_max_speed()
+{
+    const char *path = "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq";
+    FILE *file = fopen(path, "r");
+    if (!file) {
+        perror("Failed to open cpuinfo_max_freq");
+        return -1.0;
+    }
+
+    long khz;
+    if (fscanf(file, "%ld", &khz) != 1) {
+        fclose(file);
+        return -1.0;
+    }
+
+    fclose(file);
+    return (double)khz / 1000.0;
+}
+
 
 /**
  * Returns the average temperature of the CPU in celsius. 
@@ -100,7 +122,6 @@ double cpu_temp()
  */
 int cpu_usage()
 {
-    // This file is the reported CPU usage
     const char *path = "/proc/stat";
 
     // Two readings are required to get usage over time - not instance
@@ -114,7 +135,7 @@ int cpu_usage()
     fclose(file);
 
     // Sleep for a second and let the file update
-    sleep(1); 
+    sleep(1); // TODO: Will have to optimize this later
     
     file = fopen(path, "r");
     validate_file(file);

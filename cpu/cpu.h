@@ -11,5 +11,6 @@
 double cpu_temp(void);
 int cpu_usage(void);
 double cpu_speed(void);
+double cpu_max_speed(void);
 
 #endif 
