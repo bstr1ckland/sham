@@ -1,10 +1,3 @@
-/*
- * File: gpu.h
- * Author: Ben Strickland
- * Date: 2025-08-15
- * Description: Header for GPU temperature and usage functions.
- */
-
 #ifndef GPU_H
 #define GPU_H
 
@@ -16,5 +9,7 @@
 
 double gpu_temp(void);
 int gpu_usage(void);
+double vram_total(void);
+double vram_used(void);
 
 #endif 

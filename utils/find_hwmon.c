@@ -1,14 +1,12 @@
-/*
- * Make helper function that will find the right 'hwmon' file for the 
- * temp input of the target hardware. 
- * @param will be the target hardware, "cpu", "gpu"
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
 
+/**
+ * Returns the directory that the wanted hardware is located.
+ * @param target - hardware type being searched for.
+ */
 char* find_hwmon(const char* target)
 {
     const char* hwmon_root = "/sys/class/hwmon";

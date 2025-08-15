@@ -1,16 +1,11 @@
-/*
- * File: nvidia_usage.c
- * Author: Ben Strickland
- * Date: 2025-08-13
- * Notes:
- *   NVIDIA systems have it's own header file
- */
-
 #include <stdio.h>
 #include <nvml.h>
 #include "nvidia_usage.h"
 #include "../utils/errors.h"
 
+/**
+ * Returns GPU Usage in percent. 
+ */
 double get_nvidia_gpu_usage()
 {
     nvmlReturn_t result;

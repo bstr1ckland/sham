@@ -1,10 +1,9 @@
-0.1.0
+0.2.0
 
 What's New
-- CPU functions finished
+- GPU Functions finished
 
 What's Planned:
-- VRAM reporter            planned for 0.2.0 (with GPU release)
 - Disk usage reporter      planned for 0.2.1
 - RAM usage reporter       planned for 0.2.2
 - UI that wraps everything planned for 0.3.0

@@ -22,6 +22,8 @@ int main()
     // GPU
     double gpuTemp = gpu_temp();
     int gpuUsage = gpu_usage();
+    double vramUsed = vram_used();
+    double vramTotal = vram_total();
     
     // Uptime
     struct sysinfo info;
@@ -34,9 +36,16 @@ int main()
     // Print metrics
     printf("CPU Temperature: %0.1f°C\n", cpuTemp);
     printf("CPU Usage: %d%%\n", cpuUsage);
-    printf("CPU Speed: %0.1fMHz\n", cpuSpeed);
+    printf("CPU Speed: %0.1fMHz\n\n", cpuSpeed);
+
     printf("GPU Temperature: %0.1f°C\n", gpuTemp);
     printf("GPU Usage: %d%%\n", gpuUsage);
+    printf("GPU VRAM Total: %.1f GB\n", vramTotal);
+    printf("GPU VRAM Used: %.1f GB\n", vramUsed);
+
+    double vramPercent = (vramUsed / vramTotal) * 100.0;
+    printf("GPU VRAM Used Percent: %.1f%%\n\n", vramPercent);
+
     printf("System uptime: %dh %dm %ds\n", uptime_hours, 
             uptime_minutes, uptime_seconds);
     

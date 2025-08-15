@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +7,10 @@
 #include "../utils/errors.h"
 #include "../utils/find_hwmon.h"
 
+
+/**
+ * Returns the temperature of the GPU in celsius.
+ */
 double gpu_temp() 
 {
     // Find correct hwmon directory for the CPU
@@ -37,6 +42,11 @@ double gpu_temp()
     return temp_millideg / 1000.0;
 }
 
+
+/**
+ * Returns GPU usage in percentage. NVIDIA systems have it's own
+ * functionality, explaining the exclusivity
+ */
 int gpu_usage()
 {
     // Determines what kind of GPU the user has
@@ -83,4 +93,49 @@ int gpu_usage()
 
     fclose(file);
     return gpu_usage;
+}
+
+// TODO: Clean up repetitive code used below
+
+/**
+ * Returns GPU VRAM installed in the GPU in GBs.
+ */
+double vram_total()
+{
+    const char *path = "/sys/class/drm/card1/device/mem_info_vram_total";
+    FILE *file = fopen(path, "r");
+    validate_file(file);
+
+    unsigned long long bytes;
+    if (fscanf(file, "%llu", &bytes) != 1) {
+        perror("Failed to read total VRAM");
+        fclose(file);
+        return -1;
+    }
+    fclose(file);
+
+    // Convert bytes -> GB
+    return bytes / pow(1024.0, 3);
+}
+
+
+/**
+ * Returns GPU VRAM actively used in the GPU in GBs.
+ */
+double vram_used() 
+{
+    const char *path = "/sys/class/drm/card1/device/mem_info_vram_used";
+    FILE *file = fopen(path, "r");
+    validate_file(file);
+
+    unsigned long long bytes;
+    if (fscanf(file, "%llu", &bytes) != 1)
+    {
+        perror("Failed to read used VRAM");
+        fclose(file);
+        return -1;
+    }
+    fclose(file);
+
+    return bytes / pow(1024.0, 3);
 }

@@ -1,9 +1,3 @@
-/*
- * File: nvidia_usage.h
- * Author: Ben Strickland
- * Date: 2025-07-22
- */
-
 #ifndef NVIDIA_USAGE_H
 #define NVIDIA_USAGE_H
 

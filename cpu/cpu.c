@@ -6,6 +6,10 @@
 #include "../utils/errors.h"
 #include "../utils/find_hwmon.h"
 
+
+/**
+ * Returns the average speed of the CPU in MHz.
+ */
 double cpu_speed()
 {
     const char *path = "/proc/cpuinfo";
@@ -32,6 +36,10 @@ double cpu_speed()
     return total_mhz / core_count;
 }
 
+
+/**
+ * Returns the average temperature of the CPU in celsius. 
+ */
 double cpu_temp() 
 {
     // Find correct hwmon directory for the CPU
@@ -63,15 +71,19 @@ double cpu_temp()
     return temp_millideg / 1000.0;
 }
 
-/*
- * https://forums.raspberrypi.com/viewtopic.php?t=229992
+
+/** 
+ * Returns the average usage of the CPU in percentage.
+ * 
+ * Reference
+ *   https://forums.raspberrypi.com/viewtopic.php?t=229992
  * 
  * Formula: CPU Utilization (%) = ((TOTAL - IDLE) / TOTAL) * 100
  *   IDLE = idle + iowait;
  *   USED = user + nice + system + irq + softirq + steal;
  *   TOTAL = IDLE + USED;
  *
- * /proc/stat file info:
+ * /proc/stat file info (example):
  * cpu  user     nice    system    idle      iowait    irq    softirq    steal   guest  guest_nice
  *      204200   595     39028     4053660   3638      0      1222       0       0      0
  * 

@@ -1,9 +1,3 @@
-/*
- * File: errors.c
- * Author: Ben Strickland
- * Date: 2025-07-20
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 
