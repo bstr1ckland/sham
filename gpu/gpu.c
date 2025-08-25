@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gpu.h"
-#include "nvidia_usage.h"
+#include "nvidia.h"
 #include "../utils/errors.h"
 #include "../utils/find_hwmon.h"
 
@@ -95,8 +95,7 @@ int gpu_usage()
     return gpu_usage;
 }
 
-// TODO: Clean up repetitive code used below
-
+// TODO: Make the two methods below support NVIDIA too - INTEL doesn't have VRAM
 /**
  * Returns GPU VRAM installed in the GPU in GBs.
  */
