@@ -29,7 +29,7 @@ double gpu_temp()
     validate_file(file);
 
     int temp_millideg;
-    if (fscanf(file, "%d", &temp_millideg) != 1) 
+    if(fscanf(file, "%d", &temp_millideg) != 1) 
     {
         perror("Failed to read CPU temperature");
         fclose(file);
@@ -74,7 +74,7 @@ int gpu_usage()
             const char *amd_intel_path = "/sys/class/drm/card1/device/gpu_busy_percent";
             FILE *amd_intel_file = fopen(amd_intel_path, "r");
 
-            if (fscanf(amd_intel_file, "%d", &gpu_usage) != 1)
+            if(fscanf(amd_intel_file, "%d", &gpu_usage) != 1)
             {
                 perror("Failed to read GPU usage");
                 fclose(file);
@@ -95,22 +95,52 @@ int gpu_usage()
     return gpu_usage;
 }
 
-// TODO: Make the two methods below support NVIDIA too - INTEL doesn't have VRAM
+
 /**
  * Returns GPU VRAM installed in the GPU in GBs.
  */
 double vram_total()
 {
-    const char *path = "/sys/class/drm/card1/device/mem_info_vram_total";
+    const char *path = "/sys/class/drm/card1/device/vendor";
     FILE *file = fopen(path, "r");
     validate_file(file);
 
-    unsigned long long bytes;
-    if (fscanf(file, "%llu", &bytes) != 1) {
-        perror("Failed to read total VRAM");
+    // Convert the hex string to an int
+    unsigned int vendor_id;
+    if(fscanf(file, "%x", &vendor_id) != 1)
+    {
+        perror("Failed to read GPU vendor ID");
         fclose(file);
         return -1;
     }
+    
+    unsigned long long bytes;
+    switch(vendor_id)
+    {
+        case AMD_GPU1:
+        case AMD_GPU2:
+            const char *amd_path = "/sys/class/drm/card1/device/mem_info_vram_total";
+            FILE *amd_file = fopen(amd_path, "r");
+            validate_file(file);
+
+            if(fscanf(amd_file, "%llu", &bytes) != 1) {
+                perror("Failed to read total VRAM");
+                fclose(amd_file);
+                return -1;
+            }
+            fclose(amd_file);
+            break;
+
+        case INTEL_GPU:
+            perror("Error: Intel GPU does not have VRAM support");
+            return -1;
+            break;
+
+        case NVIDIA_GPU:
+            bytes = nvidia_vram_total();
+            break;
+    }
+
     fclose(file);
 
     // Convert bytes -> GB
@@ -123,18 +153,48 @@ double vram_total()
  */
 double vram_used() 
 {
-    const char *path = "/sys/class/drm/card1/device/mem_info_vram_used";
+    const char *path = "/sys/class/drm/card1/device/vendor";
     FILE *file = fopen(path, "r");
     validate_file(file);
 
-    unsigned long long bytes;
-    if (fscanf(file, "%llu", &bytes) != 1)
+    // Convert the hex string to an int
+    unsigned int vendor_id;
+    if(fscanf(file, "%x", &vendor_id) != 1)
     {
-        perror("Failed to read used VRAM");
+        perror("Failed to read GPU vendor ID");
         fclose(file);
         return -1;
     }
+    
+    unsigned long long bytes;
+    switch(vendor_id)
+    {
+        case AMD_GPU1:
+        case AMD_GPU2:
+            const char *amd_path = "/sys/class/drm/card1/device/mem_info_vram_used";
+            FILE *amd_file = fopen(amd_path, "r");
+            validate_file(amd_file);
+
+            if(fscanf(amd_file, "%llu", &bytes) != 1)
+            {
+                perror("Failed to read used VRAM");
+                fclose(amd_file);
+                return -1;
+            }
+            break;
+
+        case INTEL_GPU:
+            perror("Error: Intel GPU does not have VRAM support");
+            return -1;
+            break;
+
+        case NVIDIA_GPU:
+            bytes = nvidia_vram_total();
+            break;
+    }
+
     fclose(file);
 
+    // Convert bytes -> GB
     return bytes / pow(1024.0, 3);
 }

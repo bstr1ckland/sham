@@ -15,20 +15,20 @@ double get_nvidia_gpu_usage()
     nvmlUtilization_t utilization;
 
     result = nvmlInit();
-    if (result != NVML_SUCCESS) {
+    if(result != NVML_SUCCESS) {
         printf("Failed to initialize NVML: %s\n", nvmlErrorString(result));
         return 1;
     }
 
     result = nvmlDeviceGetHandleByIndex(0, &device);
-    if (result != NVML_SUCCESS) {
+    if(result != NVML_SUCCESS) {
         printf("Failed to get handle for device 0: %s\n", nvmlErrorString(result));
         nvmlShutdown();
         return 1;
     }
 
     result = nvmlDeviceGetUtilizationRates(device, &utilization);
-    if (result != NVML_SUCCESS) {
+    if(result != NVML_SUCCESS) {
         printf("Failed to get utilization rates: %s\n", nvmlErrorString(result));
     } else {
         printf("GPU Utilization: %u%%\n", utilization.gpu);
@@ -53,20 +53,20 @@ double nvidia_vram_total()
 
     // Initialize NVML
     result = nvmlInit();
-    if (result != NVML_SUCCESS) {
+    if(result != NVML_SUCCESS) {
         fprintf(stderr, "Failed to initialize NVML: %s\n", nvmlErrorString(result));
         return -1;
     }
 
     result = nvmlDeviceGetCount(&device_count);
-    if (result != NVML_SUCCESS || device_count == 0) {
+    if(result != NVML_SUCCESS || device_count == 0) {
         fprintf(stderr, "No NVIDIA GPU found: %s\n", nvmlErrorString(result));
         nvmlShutdown();
         return -1;
     }
 
     result = nvmlDeviceGetHandleByIndex(0, &device);
-    if (result != NVML_SUCCESS) {
+    if(result != NVML_SUCCESS) {
         fprintf(stderr, "Failed to get device handle: %s\n", nvmlErrorString(result));
         nvmlShutdown();
         return -1;
@@ -74,7 +74,7 @@ double nvidia_vram_total()
 
     // Query memory info
     result = nvmlDeviceGetMemoryInfo(device, &memory);
-    if (result != NVML_SUCCESS) {
+    if(result != NVML_SUCCESS) {
         fprintf(stderr, "Failed to get memory info: %s\n", nvmlErrorString(result));
         nvmlShutdown();
         return -1;
@@ -85,4 +85,54 @@ double nvidia_vram_total()
 
     // Return total memory - later converted
     return memory.total;
+}
+
+
+/**
+ * Returns NVIDIA GPU VRAM currently used in GBs.
+ * Requires libnvidia-ml (NVML) and linking with -lnvidia-ml
+ */
+double nvidia_vram_used()
+{
+    nvmlReturn_t result;
+    nvmlDevice_t device;
+    unsigned int device_count;
+    nvmlMemory_t memory;
+
+    // Initialize NVML
+    result = nvmlInit();
+    if(result != NVML_SUCCESS) {
+        fprintf(stderr, "Failed to initialize NVML: %s\n", nvmlErrorString(result));
+        return -1;
+    }
+
+    // Get number of devices
+    result = nvmlDeviceGetCount(&device_count);
+    if(result != NVML_SUCCESS || device_count == 0) {
+        fprintf(stderr, "No NVIDIA GPU found: %s\n", nvmlErrorString(result));
+        nvmlShutdown();
+        return -1;
+    }
+
+    // For simplicity, use the first GPU (index 0)
+    result = nvmlDeviceGetHandleByIndex(0, &device);
+    if(result != NVML_SUCCESS) {
+        fprintf(stderr, "Failed to get device handle: %s\n", nvmlErrorString(result));
+        nvmlShutdown();
+        return -1;
+    }
+
+    // Query memory info
+    result = nvmlDeviceGetMemoryInfo(device, &memory);
+    if(result != NVML_SUCCESS) {
+        fprintf(stderr, "Failed to get memory info: %s\n", nvmlErrorString(result));
+        nvmlShutdown();
+        return -1;
+    }
+
+    // Clean up NVML
+    nvmlShutdown();
+
+    // Return *used* memory in GB
+    return memory.used;
 }
