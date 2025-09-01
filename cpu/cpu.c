@@ -116,36 +116,39 @@ double cpu_temp() {
  * guest:      Time running a virtual CPU (for guests under KVM/Xen) - Not needed
  * guest_nice: Time running a low-priority guest - Not needed
  */
+typedef struct {
+    unsigned long long user, nice, system, idle, iowait, irq, softirq, steal;
+} cpu_snapshot;
+
+static cpu_snapshot prev = {0};
+static int first_call = 1;
+
 int cpu_usage() {
     const char *path = "/proc/stat";
-
-    // Two readings are required to get usage over time - not instance
-    unsigned long long user1, nice1, system1, idle1, iowait1, irq1, softirq1, steal1;
-    unsigned long long user2, nice2, system2, idle2, iowait2, irq2, softirq2, steal2;
+    cpu_snapshot current;
 
     FILE *file = fopen(path, "r");
-    validate_file(file);
-    fscanf(file, "cpu %llu %llu %llu %llu %llu %llu %llu %llu", &user1, &nice1, 
-            &system1, &idle1, &iowait1, &irq1, &softirq1, &steal1);
+    if (!file) return -1;
+    fscanf(file, "cpu %llu %llu %llu %llu %llu %llu %llu %llu",
+           &current.user, &current.nice, &current.system, &current.idle,
+           &current.iowait, &current.irq, &current.softirq, &current.steal);
     fclose(file);
 
-    // Sleep for a second and let the file update
-    sleep(1); // TODO: Will have to optimize this later
-    
-    file = fopen(path, "r");
-    validate_file(file);
-    fscanf(file, "cpu %llu %llu %llu %llu %llu %llu %llu %llu", &user2, &nice2, 
-            &system2, &idle2, &iowait2, &irq2, &softirq2, &steal2);
-    fclose(file);
+    if (first_call) {
+        prev = current;
+        first_call = 0;
+        return 0; // no previous data to compare yet
+    }
 
-    // Create variables as described above to do calculation
-    unsigned long long idle_time = (idle2 + iowait2) - (idle1 + iowait1);
-    unsigned long long used_time = (user2 + nice2 + system2 + irq2 + softirq2 + steal2) 
-            - (user1 + nice1 + system1 + irq1 + softirq1 + steal1);
+    unsigned long long idle_time = (current.idle + current.iowait) - (prev.idle + prev.iowait);
+    unsigned long long used_time = (current.user + current.nice + current.system + 
+                                    current.irq + current.softirq + current.steal) -
+                                   (prev.user + prev.nice + prev.system + 
+                                    prev.irq + prev.softirq + prev.steal);
     unsigned long long total_time = idle_time + used_time;
 
-    // Avoid division by 0
-    if(total_time == 0) return 0;
+    prev = current;
 
-    return (int)(((double)used_time / total_time) * 100.0 + 0.5);;
+    if (total_time == 0) return 0;
+    return (int)(((double)used_time / total_time) * 100.0 + 0.5);
 }
