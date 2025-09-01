@@ -11,8 +11,7 @@
 /**
  * Returns the temperature of the GPU in celsius.
  */
-double gpu_temp() 
-{
+double gpu_temp() {
     // Find correct hwmon directory for the CPU
     char *hwmon_dir = find_hwmon("gpu");
     if (!hwmon_dir) {
@@ -29,8 +28,7 @@ double gpu_temp()
     validate_file(file);
 
     int temp_millideg;
-    if(fscanf(file, "%d", &temp_millideg) != 1) 
-    {
+    if(fscanf(file, "%d", &temp_millideg) != 1) {
         perror("Failed to read CPU temperature");
         fclose(file);
         return -1;
@@ -57,20 +55,18 @@ int gpu_usage()
 
     // Convert the hex string to an int
     unsigned int vendor_id;
-    if(fscanf(file, "%x", &vendor_id) != 1)
-    {
+    if(fscanf(file, "%x", &vendor_id) != 1) {
         perror("Failed to read GPU vendor ID");
         fclose(file);
         return -1;
     }
     
     int gpu_usage;
-    switch(vendor_id)
-    {
+    switch(vendor_id) {
         // AMD and Intel GPUs have the same filepath usage
         case INTEL_GPU:
         case AMD_GPU1:
-        case AMD_GPU2:
+        case AMD_GPU2: {
             const char *amd_intel_path = "/sys/class/drm/card1/device/gpu_busy_percent";
             FILE *amd_intel_file = fopen(amd_intel_path, "r");
 
@@ -81,10 +77,12 @@ int gpu_usage()
                 return -1;
             }
             break;
+        }
 
-        case NVIDIA_GPU:
+        case NVIDIA_GPU: {
             gpu_usage = get_nvidia_gpu_usage();
             break;
+        }
 
         default:
             printf("Error: Your device is not supported, or GPU not found.\n");
@@ -99,26 +97,23 @@ int gpu_usage()
 /**
  * Returns GPU VRAM installed in the GPU in GBs.
  */
-double vram_total()
-{
+double vram_total() {
     const char *path = "/sys/class/drm/card1/device/vendor";
     FILE *file = fopen(path, "r");
     validate_file(file);
 
     // Convert the hex string to an int
     unsigned int vendor_id;
-    if(fscanf(file, "%x", &vendor_id) != 1)
-    {
+    if(fscanf(file, "%x", &vendor_id) != 1) {
         perror("Failed to read GPU vendor ID");
         fclose(file);
         return -1;
     }
     
     unsigned long long bytes;
-    switch(vendor_id)
-    {
+    switch(vendor_id) {
         case AMD_GPU1:
-        case AMD_GPU2:
+        case AMD_GPU2: {
             const char *amd_path = "/sys/class/drm/card1/device/mem_info_vram_total";
             FILE *amd_file = fopen(amd_path, "r");
             validate_file(file);
@@ -130,17 +125,19 @@ double vram_total()
             }
             fclose(amd_file);
             break;
+        }
 
-        case INTEL_GPU:
+        case INTEL_GPU: {
             perror("Error: Intel GPU does not have VRAM support");
             return -1;
             break;
+        }
 
-        case NVIDIA_GPU:
+        case NVIDIA_GPU: {
             bytes = nvidia_vram_total();
             break;
+        }       
     }
-
     fclose(file);
 
     // Convert bytes -> GB
@@ -151,26 +148,23 @@ double vram_total()
 /**
  * Returns GPU VRAM actively used in the GPU in GBs.
  */
-double vram_used() 
-{
+double vram_used() {
     const char *path = "/sys/class/drm/card1/device/vendor";
     FILE *file = fopen(path, "r");
     validate_file(file);
 
     // Convert the hex string to an int
     unsigned int vendor_id;
-    if(fscanf(file, "%x", &vendor_id) != 1)
-    {
+    if(fscanf(file, "%x", &vendor_id) != 1) {
         perror("Failed to read GPU vendor ID");
         fclose(file);
         return -1;
     }
     
     unsigned long long bytes;
-    switch(vendor_id)
-    {
+    switch(vendor_id) {
         case AMD_GPU1:
-        case AMD_GPU2:
+        case AMD_GPU2: {
             const char *amd_path = "/sys/class/drm/card1/device/mem_info_vram_used";
             FILE *amd_file = fopen(amd_path, "r");
             validate_file(amd_file);
@@ -182,17 +176,17 @@ double vram_used()
                 return -1;
             }
             break;
-
-        case INTEL_GPU:
+        }
+        case INTEL_GPU: {
             perror("Error: Intel GPU does not have VRAM support");
             return -1;
             break;
-
-        case NVIDIA_GPU:
+        }
+        case NVIDIA_GPU: {
             bytes = nvidia_vram_total();
             break;
+        }        
     }
-
     fclose(file);
 
     // Convert bytes -> GB

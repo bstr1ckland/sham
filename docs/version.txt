@@ -1,9 +1,7 @@
-0.2.1
+0.2.2
 
-What's New
-- GPU Functions finished
-
-What's Planned:
-- Disk usage reporter      planned for 0.2.1
-- RAM usage reporter       planned for 0.2.2
-- UI that wraps everything planned for 0.3.0
+Planned updates:
+- Advanced mode
+    - Per core info
+    - More RAM & GPU info
+    - And more!

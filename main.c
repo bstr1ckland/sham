@@ -10,10 +10,10 @@
 #include <sys/sysinfo.h>
 #include "cpu/cpu.h"
 #include "gpu/gpu.h"
+#include "ram/ram.h"
 #include "utils/find_hwmon.h"
 
-int main()
-{
+int main() {
     // CPU
     double cpuTemp = cpu_temp(); 
     int cpuUsage = cpu_usage();
@@ -25,6 +25,10 @@ int main()
     int gpuUsage = gpu_usage();
     double vramUsed = vram_used();
     double vramTotal = vram_total();
+
+    // RAM
+    double totalRam = ram_info("MemTotal");
+    double freeRam = ram_info("MemAvailable");
     
     // Uptime
     struct sysinfo info;
@@ -46,8 +50,12 @@ int main()
     double vramPercent = (vramUsed / vramTotal) * 100.0;
     printf("GPU VRAM Used Percent: %.1f%%\n\n", vramPercent);
 
+    printf("Total RAM: %.1fGB\n", totalRam);
+    printf("Free RAM: %.1fGB\n\n", freeRam);
+
     printf("System uptime: %dh %dm %ds\n", uptime_hours, 
             uptime_minutes, uptime_seconds);
+
     
     return 0;
 }

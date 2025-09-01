@@ -7,8 +7,7 @@
  * Returns the directory that the wanted hardware is located.
  * @param target - hardware type being searched for.
  */
-char* find_hwmon(const char* target)
-{
+char* find_hwmon(const char* target) {
     const char* hwmon_root = "/sys/class/hwmon";
     DIR *dir = opendir(hwmon_root);
     struct dirent *entry;
@@ -34,8 +33,7 @@ char* find_hwmon(const char* target)
         return NULL;
     }
 
-    while ((entry = readdir(dir)) != NULL) 
-    {
+    while ((entry = readdir(dir)) != NULL) {
         // Ignore current and prev dir's
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry -> d_name, "..") == 0)
             continue;

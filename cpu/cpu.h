@@ -1,10 +1,3 @@
-/*
- * File: gpu.h
- * Author: Ben Strickland
- * Date: 2025-08-15
- * Description: Header for CPU temperature, usage functions and speed.
- */
-
 #ifndef CPU_H
 #define CPU_H
 

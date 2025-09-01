@@ -10,8 +10,7 @@
 /**
  * Returns the average speed of the CPU in MHz.
  */
-double cpu_speed()
-{
+double cpu_speed() {
     const char *path = "/proc/cpuinfo";
     FILE *file = fopen(path, "r");
     validate_file(file);
@@ -39,8 +38,7 @@ double cpu_speed()
 /**
  * Returns the maximum speed for CPU in MHz
  */
-double cpu_max_speed()
-{
+double cpu_max_speed() {
     const char *path = "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq";
     FILE *file = fopen(path, "r");
     if (!file) {
@@ -62,8 +60,7 @@ double cpu_max_speed()
 /**
  * Returns the average temperature of the CPU in celsius. 
  */
-double cpu_temp() 
-{
+double cpu_temp() {
     // Find correct hwmon directory for the CPU
     char *hwmon_dir = find_hwmon("cpu");
     if (!hwmon_dir) {
@@ -80,8 +77,7 @@ double cpu_temp()
     validate_file(file);
 
     int temp_millideg;
-    if (fscanf(file, "%d", &temp_millideg) != 1) 
-    {
+    if (fscanf(file, "%d", &temp_millideg) != 1) {
         perror("Failed to read CPU temperature");
         fclose(file);
         return -1;
@@ -120,8 +116,7 @@ double cpu_temp()
  * guest:      Time running a virtual CPU (for guests under KVM/Xen) - Not needed
  * guest_nice: Time running a low-priority guest - Not needed
  */
-int cpu_usage()
-{
+int cpu_usage() {
     const char *path = "/proc/stat";
 
     // Two readings are required to get usage over time - not instance

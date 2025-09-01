@@ -7,7 +7,7 @@ if [ -f "$NVML_HEADER" ]; then
     USE_NVML=1
 fi
 
-SRC="main.c utils/errors.c utils/find_hwmon.c cpu/cpu.c gpu/gpu.c"
+SRC="main.c utils/errors.c utils/find_hwmon.c cpu/cpu.c gpu/gpu.c ram/ram.c"
 
 if [ $USE_NVML -eq 1 ]; then
     SRC="$SRC gpu/nvidia_usage.c"
