@@ -7,85 +7,141 @@
 #include "ram/ram.h"
 #include "utils/find_hwmon.h"
 
+typedef enum { TAB_SYSTEM, TAB_PROCESSES} Tab;
+
+void draw_system() {
+    int row = 1;
+
+    struct sysinfo info;
+    sysinfo(&info);
+    int hours = info.uptime / 3600;
+    int minutes = (info.uptime % 3600) / 60;
+    int seconds = info.uptime % 60;
+    attron(A_BOLD);
+    mvprintw(row++, 2, "System Uptime: %dh %dm %ds", hours, minutes, seconds);
+    attroff(A_BOLD);
+
+    row++;
+
+    double cpuTemp = cpu_temp(); 
+    int cpuUsage = cpu_usage();
+    double cpuSpeed = cpu_speed();
+    double cpuMaxSpeed = cpu_max_speed();
+
+    attron(A_BOLD);
+    mvprintw(row++, 2, "CPU Metrics");
+    attroff(A_BOLD);
+
+    mvprintw(row, 4, "Temperature: ");
+    if (cpuTemp < 60) attron(COLOR_PAIR(1));
+    else if (cpuTemp < 80) attron(COLOR_PAIR(2));
+    else attron(COLOR_PAIR(3));
+    printw("%.1f°C", cpuTemp);
+    attroff(COLOR_PAIR(1) | COLOR_PAIR(2) | COLOR_PAIR(3));
+    row++;
+
+    mvprintw(row, 4, "Usage: ");
+    if (cpuUsage < 50) attron(COLOR_PAIR(1));
+    else if (cpuUsage < 80) attron(COLOR_PAIR(2));
+    else attron(COLOR_PAIR(3));
+    printw("%d%%", cpuUsage);
+    attroff(COLOR_PAIR(1) | COLOR_PAIR(2) | COLOR_PAIR(3));
+    row++;
+
+    mvprintw(row++, 4, "Speed: %.1fMHz / %.1fMHz", cpuSpeed, cpuMaxSpeed);
+
+    row++;
+
+    double gpuTemp = gpu_temp();
+    int gpuUsage = gpu_usage();
+    double vramUsed = vram_used();
+    double vramTotal = vram_total();
+    double vramPercent = (vramUsed / vramTotal) * 100.0;
+
+    attron(A_BOLD);
+    mvprintw(row++, 2, "GPU Metrics");
+    attroff(A_BOLD);
+
+    mvprintw(row, 4, "Temperature: ");
+    if (gpuTemp < 65) attron(COLOR_PAIR(1));
+    else if (gpuTemp < 85) attron(COLOR_PAIR(2));
+    else attron(COLOR_PAIR(3));
+    printw("%.1f°C", gpuTemp);
+    attroff(COLOR_PAIR(1) | COLOR_PAIR(2) | COLOR_PAIR(3));
+    row++;
+
+    mvprintw(row, 4, "Usage: ");
+    if (gpuUsage < 50) attron(COLOR_PAIR(1));
+    else if (gpuUsage < 80) attron(COLOR_PAIR(2));
+    else attron(COLOR_PAIR(3));
+    printw("%d%%", gpuUsage);
+    attroff(COLOR_PAIR(1) | COLOR_PAIR(2) | COLOR_PAIR(3));
+    row++;
+
+    mvprintw(row++, 4, "VRAM: %.1fGB / %.1fGB (%.1f%%)", vramUsed, vramTotal, vramPercent);
+
+    double totalRam = ram_info("MemTotal");
+    double freeRam = ram_info("MemAvailable");
+
+    row++;
+
+    attron(A_BOLD);
+    mvprintw(row++, 2, "RAM Metrics");
+    attroff(A_BOLD);
+    mvprintw(row++, 4, "Free: %.1fGB / %.1fGB", freeRam, totalRam);
+    mvprintw(row++, 4, "Used RAM: %.1fGB / %.1fGB", totalRam - freeRam, totalRam);
+}
+
+
+void draw_processes() {
+    attron(A_BOLD);
+    mvprintw(1, 2, "Coming soon");
+    attroff(A_BOLD);
+}
+
 void draw_ui() {
-    // Initialize ncurses
     initscr();
     cbreak();
     noecho();
     curs_set(FALSE);
-    timeout(500); // Non-blocking getch with 1-second refresh
+    timeout(900); 
     start_color();
-
-    // Color pairs
     init_pair(1, COLOR_GREEN, COLOR_BLACK);
     init_pair(2, COLOR_YELLOW, COLOR_BLACK);
     init_pair(3, COLOR_RED, COLOR_BLACK);
+    init_pair(4, COLOR_CYAN, COLOR_BLACK);
+
+    Tab current_tab = TAB_SYSTEM;
 
     while (1) {
         clear();
 
-        // CPU
-        double cpuTemp = cpu_temp(); 
-        int cpuUsage = cpu_usage();
-        double cpuSpeed = cpu_speed();
-        double cpuMaxSpeed = cpu_max_speed();
+        // Draw tab header
+        attron(A_REVERSE);
+        mvprintw(0, 2, " [S] System ");
+        mvprintw(0, 15, " [P] Processes ");
+        attroff(A_REVERSE);
 
-        // GPU
-        double gpuTemp = gpu_temp();
-        int gpuUsage = gpu_usage();
-        double vramUsed = vram_used();
-        double vramTotal = vram_total();
-        double vramPercent = (vramUsed / vramTotal) * 100.0;
+        // Highlight current tab
+        switch (current_tab) {
+            case TAB_SYSTEM: attron(COLOR_PAIR(4)); mvprintw(0, 2, " [S] System "); attroff(COLOR_PAIR(1)); break;
+            case TAB_PROCESSES: attron(COLOR_PAIR(4)); mvprintw(0, 15, " [P] Processes "); attroff(COLOR_PAIR(1)); break;
+        }
 
-        // RAM
-        double totalRam = ram_info("MemTotal");
-        double freeRam = ram_info("MemAvailable");
+        // Draw content for the selected tab
+        switch (current_tab) {
+            case TAB_SYSTEM: draw_system(); break;
+            case TAB_PROCESSES: draw_processes(); break;
+        }
 
-        // Uptime
-        struct sysinfo info;
-        sysinfo(&info);
-        int uptime_hours = info.uptime / 3600;
-        int uptime_minutes = (info.uptime % 3600) / 60;
-        int uptime_seconds = info.uptime % 60;
-
-        // Draw CPU section
-        attron(A_BOLD);
-        mvprintw(1, 2, "CPU Metrics");
-        attroff(A_BOLD);
-        mvprintw(2, 4, "Temperature: %.1f°C", cpuTemp);
-        mvprintw(3, 4, "Usage: %d%%", cpuUsage);
-        mvprintw(4, 4, "Speed: %.1fMHz / %.1fMHz", cpuSpeed, cpuMaxSpeed);
-
-        // Draw GPU section
-        attron(A_BOLD);
-        mvprintw(6, 2, "GPU Metrics");
-        attroff(A_BOLD);
-        mvprintw(7, 4, "Temperature: %.1f°C", gpuTemp);
-        mvprintw(8, 4, "Usage: %d%%", gpuUsage);
-        mvprintw(9, 4, "VRAM: %.1fGB / %.1fGB (%.1f%%)", vramUsed, vramTotal, vramPercent);
-
-        // Draw RAM section
-        attron(A_BOLD);
-        mvprintw(11, 2, "RAM Metrics");
-        attroff(A_BOLD);
-        mvprintw(12, 4, "Total: %.1fGB", totalRam);
-        mvprintw(13, 4, "Free: %.1fGB", freeRam);
-
-        // Draw Uptime
-        attron(A_BOLD);
-        mvprintw(15, 2, "System Uptime");
-        attroff(A_BOLD);
-        mvprintw(16, 4, "%dh %dm %ds", uptime_hours, uptime_minutes, uptime_seconds);
-
-        // Refresh screen
         refresh();
 
-        // Exit if user presses 'q'
         int ch = getch();
         if (ch == 'q' || ch == 'Q') break;
+        else if (ch == 's' || ch == 'S') current_tab = TAB_SYSTEM;
+        else if (ch == 'p' || ch == 'P') current_tab = TAB_PROCESSES;
     }
 
-    // End ncurses
     endwin();
 }
 
