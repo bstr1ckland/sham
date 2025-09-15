@@ -23,15 +23,16 @@ void draw_system() {
 
     row++;
 
+    /**
+     * CPU
+     */
     double cpuTemp = cpu_temp(); 
     int cpuUsage = cpu_usage();
     double cpuSpeed = cpu_speed();
     double cpuMaxSpeed = cpu_max_speed();
-
     attron(A_BOLD);
     mvprintw(row++, 2, "CPU Metrics");
     attroff(A_BOLD);
-
     mvprintw(row, 4, "Temperature: ");
     if (cpuTemp < 60) attron(COLOR_PAIR(1));
     else if (cpuTemp < 80) attron(COLOR_PAIR(2));
@@ -39,7 +40,6 @@ void draw_system() {
     printw("%.1f°C", cpuTemp);
     attroff(COLOR_PAIR(1) | COLOR_PAIR(2) | COLOR_PAIR(3));
     row++;
-
     mvprintw(row, 4, "Usage: ");
     if (cpuUsage < 50) attron(COLOR_PAIR(1));
     else if (cpuUsage < 80) attron(COLOR_PAIR(2));
@@ -52,16 +52,17 @@ void draw_system() {
 
     row++;
 
+    /**
+     * GPU
+     */
     double gpuTemp = gpu_temp();
     int gpuUsage = gpu_usage();
     double vramUsed = vram_used();
     double vramTotal = vram_total();
     double vramPercent = (vramUsed / vramTotal) * 100.0;
-
     attron(A_BOLD);
     mvprintw(row++, 2, "GPU Metrics");
     attroff(A_BOLD);
-
     mvprintw(row, 4, "Temperature: ");
     if (gpuTemp < 65) attron(COLOR_PAIR(1));
     else if (gpuTemp < 85) attron(COLOR_PAIR(2));
@@ -69,17 +70,19 @@ void draw_system() {
     printw("%.1f°C", gpuTemp);
     attroff(COLOR_PAIR(1) | COLOR_PAIR(2) | COLOR_PAIR(3));
     row++;
-
     mvprintw(row, 4, "Usage: ");
     if (gpuUsage < 50) attron(COLOR_PAIR(1));
     else if (gpuUsage < 80) attron(COLOR_PAIR(2));
     else attron(COLOR_PAIR(3));
     printw("%d%%", gpuUsage);
     attroff(COLOR_PAIR(1) | COLOR_PAIR(2) | COLOR_PAIR(3));
+    
     row++;
 
+    /**
+     * RAM
+     */
     mvprintw(row++, 4, "VRAM: %.1fGB / %.1fGB (%.1f%%)", vramUsed, vramTotal, vramPercent);
-
     double totalRam = ram_info("MemTotal");
     double freeRam = ram_info("MemAvailable");
 
@@ -89,7 +92,7 @@ void draw_system() {
     mvprintw(row++, 2, "RAM Metrics");
     attroff(A_BOLD);
     mvprintw(row++, 4, "Free: %.1fGB / %.1fGB", freeRam, totalRam);
-    mvprintw(row++, 4, "Used RAM: %.1fGB / %.1fGB", totalRam - freeRam, totalRam);
+    mvprintw(row++, 4, "Used: %.1fGB / %.1fGB", totalRam - freeRam, totalRam);
 }
 
 
@@ -98,6 +101,17 @@ void draw_processes() {
     mvprintw(1, 2, "Coming soon");
     attroff(A_BOLD);
 }
+
+void draw_bar(int row, int col, int width, double percent) {
+    int filled = (int)((percent / 100.0) * width);
+    for (int i = 0; i < width; i++) {
+        if (i < filled) attron(COLOR_PAIR(2)); // filled part
+        else attron(COLOR_PAIR(1));            // empty part
+        mvprintw(row, col + i, "█");
+        attroff(COLOR_PAIR(1) | COLOR_PAIR(2));
+    }
+}
+
 
 void draw_ui() {
     initscr();
@@ -122,13 +136,11 @@ void draw_ui() {
         mvprintw(0, 15, " [P] Processes ");
         attroff(A_REVERSE);
 
-        // Highlight current tab
         switch (current_tab) {
             case TAB_SYSTEM: attron(COLOR_PAIR(4)); mvprintw(0, 2, " [S] System "); attroff(COLOR_PAIR(1)); break;
             case TAB_PROCESSES: attron(COLOR_PAIR(4)); mvprintw(0, 15, " [P] Processes "); attroff(COLOR_PAIR(1)); break;
         }
 
-        // Draw content for the selected tab
         switch (current_tab) {
             case TAB_SYSTEM: draw_system(); break;
             case TAB_PROCESSES: draw_processes(); break;
