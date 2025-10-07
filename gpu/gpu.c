@@ -69,20 +69,23 @@ int gpu_usage()
         case AMD_GPU2: {
             const char *amd_intel_path = "/sys/class/drm/card1/device/gpu_busy_percent";
             FILE *amd_intel_file = fopen(amd_intel_path, "r");
+            if (!amd_intel_file) {
+                perror("Failed to open gpu_busy_percent");
+                fclose(file); // close vendor file before returning
+                return -1;
+            }
 
-            if(fscanf(amd_intel_file, "%d", &gpu_usage) != 1)
-            {
+            if (fscanf(amd_intel_file, "%d", &gpu_usage) != 1) {
                 perror("Failed to read GPU usage");
+                fclose(amd_intel_file);
                 fclose(file);
                 return -1;
             }
+            fclose(amd_intel_file);
             break;
         }
-
-        case NVIDIA_GPU: {
+        case NVIDIA_GPU:
             gpu_usage = get_nvidia_gpu_usage();
-            break;
-        }
 
         default:
             printf("Error: Your device is not supported, or GPU not found.\n");
@@ -116,11 +119,16 @@ double vram_total() {
         case AMD_GPU2: {
             const char *amd_path = "/sys/class/drm/card1/device/mem_info_vram_total";
             FILE *amd_file = fopen(amd_path, "r");
-            validate_file(file);
+            if (!amd_file) {
+                perror("Failed to open mem_info_vram_total");
+                fclose(file); // vendor file
+                return -1;
+            }
 
-            if(fscanf(amd_file, "%llu", &bytes) != 1) {
+            if (fscanf(amd_file, "%llu", &bytes) != 1) {
                 perror("Failed to read total VRAM");
                 fclose(amd_file);
+                fclose(file);
                 return -1;
             }
             fclose(amd_file);
@@ -141,6 +149,7 @@ double vram_total() {
     fclose(file);
 
     // Convert bytes -> GB
+    if(bytes == 0); return -1;
     return bytes / pow(1024.0, 3);
 }
 
@@ -167,26 +176,27 @@ double vram_used() {
         case AMD_GPU2: {
             const char *amd_path = "/sys/class/drm/card1/device/mem_info_vram_used";
             FILE *amd_file = fopen(amd_path, "r");
-            validate_file(amd_file);
-
-            if(fscanf(amd_file, "%llu", &bytes) != 1)
-            {
-                perror("Failed to read used VRAM");
-                fclose(amd_file);
+            if (!amd_file) {
+                perror("Failed to open mem_info_vram_used");
+                fclose(file);
                 return -1;
             }
-            break;
-        }
-        case INTEL_GPU: {
-            perror("Error: Intel GPU does not have VRAM support");
-            return -1;
+
+            if (fscanf(amd_file, "%llu", &bytes) != 1) {
+                perror("Failed to read used VRAM");
+                fclose(amd_file);
+                fclose(file);
+                return -1;
+            }
+            fclose(amd_file);
             break;
         }
         case NVIDIA_GPU: {
-            bytes = nvidia_vram_total();
+            bytes = nvidia_vram_used(); // previously called nvidia_vram_total()
             break;
-        }        
+        }
     }
+
     fclose(file);
 
     // Convert bytes -> GB
