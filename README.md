@@ -1,1 +1,1 @@
-# Working on refactoring this project
+# Updated to https://github.com/bstr1ckland/linux-hardware-monitor
